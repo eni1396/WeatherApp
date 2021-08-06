@@ -23,6 +23,7 @@ final class WeatherViewController: UIViewController {
     private lazy var searchBar: UISearchBar = {
         let bar = UISearchBar()
         bar.delegate = self
+        bar.showsCancelButton = true
         bar.placeholder = "Найти город..."
         return bar
     }()
@@ -115,14 +116,9 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension WeatherViewController: UISearchBarDelegate {
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchBar.showsCancelButton = true
-    }
-    
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         searchBar.resignFirstResponder()
-        searchBar.showsCancelButton = false
     }
     //MARK:- Поиск нового города
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
