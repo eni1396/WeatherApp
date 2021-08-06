@@ -27,17 +27,17 @@ class DetailViewController: UIViewController {
         stack.axis = .vertical
         stack.alignment = .fill
         stack.distribution = .equalSpacing
-        stack.spacing = 20
+        stack.spacing = 10
         return stack
     }()
     
-    //Picture
-    
+    private let scroll = UIScrollView()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        setupUI()
         
+        setupUI()
     }
     
     func configure(for city: String, with weather: Weather) {
@@ -53,11 +53,13 @@ class DetailViewController: UIViewController {
     }
     
     private func setupUI() {
+
+        [cityImage, stack].forEach {
+            view.addSubview($0)
+        }
         
-        view.addSubview(cityImage)
-        view.addSubview(stack)
          [cityTemperature, cityPressure, cityHumidity, cityCondition, cityWindSpeed, cityWindDirection].forEach {
-            $0.font = .systemFont(ofSize: 25)
+            $0.font = .systemFont(ofSize: 17)
         }
         
         cityImage.snp.makeConstraints { maker in
@@ -67,7 +69,7 @@ class DetailViewController: UIViewController {
         }
         stack.snp.makeConstraints { maker in
             maker.centerX.equalToSuperview()
-            maker.top.equalTo(cityImage.snp.bottom).offset(50)
+            maker.top.equalTo(cityImage.snp.bottom).offset(70)
         }
     }
 }

@@ -9,11 +9,15 @@ import SnapKit
 
 final class WeatherViewController: UIViewController {
     
+    let cellID = "cell"
+    
+    //MARK:- UI элементы
     private lazy var table: UITableView = {
         let table = UITableView()
+        table.isHidden = true
         table.delegate = self
         table.dataSource = self
-        table.register(CurrentCityCell.self, forCellReuseIdentifier: "cell")
+        table.register(CurrentCityCell.self, forCellReuseIdentifier: cellID)
         return table
     }()
     private lazy var searchBar: UISearchBar = {
@@ -21,12 +25,6 @@ final class WeatherViewController: UIViewController {
         bar.delegate = self
         bar.placeholder = "Найти город..."
         return bar
-    }()
-    private lazy var addButton: UIBarButtonItem = {
-        let button = UIBarButtonItem()
-        button.action = #selector(addCity(_:))
-        button.image = .add
-        return button
     }()
     
     var cities = Cities()
@@ -37,14 +35,14 @@ final class WeatherViewController: UIViewController {
         
         presenter = WeatherPresenter()
         
-        view.backgroundColor = .green
-        navigationItem.rightBarButtonItem = addButton
         setupUI()
+        
         getWeather()
     }
-    
+    //MARK:- настройка UI элементов
     private func setupUI() {
-        title = "Яндекс Погода"
+        view.backgroundColor = .white
+        title = Constants.appTitle
         [table,searchBar].forEach {
             view.addSubview($0)
         }
@@ -59,22 +57,16 @@ final class WeatherViewController: UIViewController {
             maker.leading.trailing.bottom.equalToSuperview()
         }
     }
-    
-    @objc private func addCity(_ sender: UIBarButtonItem) {
-        guard let city = searchBar.text else { return }
-        cities.add(city: city)
-        getWeather()
-    }
-    
+    //MARK:- получение данных
     func getWeather() {
         cities.startCities.forEach { city in
-            presenter?.fetchData(city: city) { weather, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                    //show error alert
+            presenter?.fetchData(city: city) { [weak self] weather, error in
+                guard let self = self else { return }
+                if error != nil {
+                    self.showAlert(title: Constants.error, message: Constants.badNetwork)
                 }
-                guard let weather = weather else { return }
                 self.cities.addWeather(for: city, weather: weather)
+                self.table.isHidden = false
                 self.table.reloadData()
             }
         }
@@ -84,11 +76,12 @@ final class WeatherViewController: UIViewController {
 extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cities.count
+        return cities.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = table.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? CurrentCityCell else { return UITableViewCell() }
+        guard let cell = table.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as? CurrentCityCell else { return UITableViewCell() }
+        
         let city = cities.startCities[indexPath.row]
         if let weather = cities.weatherForCity[city] {
             cell.confiugre(with: city, weather: weather)
@@ -98,12 +91,20 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = DetailViewController()
+        
         let city = cities.startCities[indexPath.row]
         if let weather = cities.weatherForCity[city] {
             vc.configure(for: city, with: weather)
         }
         presenter?.open(vc: vc, navigation: navigationController!)
         table.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            cities.remove(at: indexPath.row)
+            table.reloadData()
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -114,5 +115,31 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension WeatherViewController: UISearchBarDelegate {
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        searchBar.resignFirstResponder()
+        searchBar.showsCancelButton = false
+    }
+    //MARK:- Поиск нового города
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        let vc = DetailViewController()
+        guard let searchedCity = searchBar.text else { return }
+        presenter?.fetchData(city: searchedCity, completion: { [weak self] weather, error in
+            if error != nil {
+                self?.showAlert(title: Constants.error, message: Constants.notFound)
+            }
+            guard let self = self else { return }
+            self.cities.add(city: searchedCity)
+            self.cities.addWeather(for: searchedCity, weather: weather)
+            vc.configure(for: searchedCity, with: weather)
+            self.table.reloadData()
+            self.presenter?.open(vc: vc, navigation: self.navigationController!)
+        })
+    }
 }
 

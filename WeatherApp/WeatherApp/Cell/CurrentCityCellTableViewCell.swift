@@ -21,6 +21,8 @@ class CurrentCityCell: UITableViewCell {
     }()
     private let cityCondition: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
+        label.textAlignment = .right
         label.font = .systemFont(ofSize: 15)
         return label
     }()
@@ -34,7 +36,7 @@ class CurrentCityCell: UITableViewCell {
     
     func confiugre(with city: String, weather: Weather) {
         cityName.text = city
-        cityTemperature.text = "Температура \(weather.temperature)°C"
+        cityTemperature.text = "Температура \(weather.temperature) °C"
         cityCondition.text = weather.localizedCondition
     }
     
@@ -53,6 +55,7 @@ class CurrentCityCell: UITableViewCell {
         
         cityCondition.snp.makeConstraints { maker in
             maker.trailing.bottom.equalToSuperview().inset(15)
+            maker.width.lessThanOrEqualTo(130)
         }
     }
 }

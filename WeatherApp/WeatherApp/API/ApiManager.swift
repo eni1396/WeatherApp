@@ -10,7 +10,7 @@ import Alamofire
 import CoreLocation
 
 struct ApiManager {
-    
+    //MARK:- Получение координат по названию города
     func fetchWithCoordinates(for city: String, completion: @escaping (Weather?, Error?) -> Void) {
         CLGeocoder().geocodeAddressString(city) { placemark, error in
             if let error = error {
@@ -24,19 +24,17 @@ struct ApiManager {
             }
         }
     }
-    
+    //MARK:- сетевой запрос
     private func fetchWeather(for city: String, latitude: Double, longitude: Double, completion: @escaping (Weather?, Error?) -> Void) {
         let path = "https://api.weather.yandex.ru/v2/forecast?lat=\(latitude)&lon=\(longitude)"
-        let token = "0edfd784-14d7-4db7-8b02-81a73988c0eb"
         guard let url = URL(string: path) else { return }
         
-        let header: HTTPHeaders = ["X-Yandex-API-Key": token, "Content-Type": "application/raw"]
+        let header: HTTPHeaders = ["X-Yandex-API-Key": Constants.token, "Content-Type": "application/raw"]
         AF.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: header).response { dataResponse in
             
             if let error = dataResponse.error {
                 completion(nil, error)
             }
-            
             guard let data = dataResponse.data,
                   let data = try? JSONDecoder().decode(WeatherModel.self, from: data) else { return }
                   let weather = Weather(weather: data)

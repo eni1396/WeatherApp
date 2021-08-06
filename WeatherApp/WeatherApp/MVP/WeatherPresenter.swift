@@ -8,22 +8,23 @@
 import UIKit
 
 protocol WeatherPresenterProtocol: AnyObject {
-    var cities: Cities { get }
     
-    func fetchData(city: String, completion: @escaping (Weather?, Error?) -> Void)
+    func fetchData(city: String, completion: @escaping (Weather, Error?) -> Void)
     func open(vc: UIViewController, navigation: UINavigationController)
 }
 
 final class WeatherPresenter: WeatherPresenterProtocol {
     
-    var cities = Cities()
     private let apiManager = ApiManager()
     
-    func fetchData(city: String, completion: @escaping (Weather?, Error?) -> Void) {
+    //MARK:- получение данных
+    func fetchData(city: String, completion: @escaping (Weather, Error?) -> Void) {
         apiManager.fetchWithCoordinates(for: city) { weather, error in
+            guard let weather = weather else { return }
             completion(weather, error)
         }
     }
+    //MARK:- открытие второго экрана
     func open(vc: UIViewController, navigation: UINavigationController) {
         navigation.pushViewController(vc, animated: true)
     }
