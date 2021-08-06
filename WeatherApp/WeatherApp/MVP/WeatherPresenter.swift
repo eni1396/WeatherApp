@@ -9,7 +9,7 @@ import UIKit
 
 protocol WeatherPresenterProtocol: AnyObject {
     
-    func fetchData(city: String, completion: @escaping (Weather, Error?) -> Void)
+    func fetchData(city: String, completion: @escaping (Weather?, Error?) -> Void)
     func open(vc: UIViewController, navigation: UINavigationController)
 }
 
@@ -18,9 +18,8 @@ final class WeatherPresenter: WeatherPresenterProtocol {
     private let apiManager = ApiManager()
     
     //MARK:- получение данных
-    func fetchData(city: String, completion: @escaping (Weather, Error?) -> Void) {
+    func fetchData(city: String, completion: @escaping (Weather?, Error?) -> Void) {
         apiManager.fetchWithCoordinates(for: city) { weather, error in
-            guard let weather = weather else { return }
             completion(weather, error)
         }
     }

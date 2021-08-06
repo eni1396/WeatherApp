@@ -66,6 +66,7 @@ final class WeatherViewController: UIViewController {
                 if error != nil {
                     self.showAlert(title: Constants.error, message: Constants.badNetwork)
                 }
+                guard let weather = weather else { return }
                 self.cities.addWeather(for: city, weather: weather)
                 self.table.isHidden = false
                 self.table.reloadData()
@@ -129,7 +130,8 @@ extension WeatherViewController: UISearchBarDelegate {
             if error != nil {
                 self?.showAlert(title: Constants.error, message: Constants.notFound)
             }
-            guard let self = self else { return }
+            guard let self = self,
+                   let weather = weather else { return }
             self.cities.add(city: searchedCity)
             self.cities.addWeather(for: searchedCity, weather: weather)
             vc.configure(for: searchedCity, with: weather)
