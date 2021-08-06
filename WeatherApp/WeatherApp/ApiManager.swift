@@ -38,8 +38,9 @@ struct ApiManager {
             }
             
             guard let data = dataResponse.data,
-                  let data = try? JSONDecoder().decode(Weather.self, from: data) else { return }
-            completion(data, nil)
+                  let data = try? JSONDecoder().decode(WeatherModel.self, from: data) else { return }
+                  let weather = Weather(weather: data)
+            completion(weather, nil)
         }
     }
 }

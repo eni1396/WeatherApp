@@ -8,7 +8,7 @@
 import Foundation
 
 protocol City {
-    var listOfCities: [String: Weather] { get }
+    var weatherForCity: [String: Weather] { get }
     var count: Int { get }
     
     mutating func add(city: String)
@@ -31,7 +31,7 @@ struct Cities: City {
         "Севастополь",
     ]
     
-    var listOfCities = [String : Weather]()
+    var weatherForCity = [String : Weather]()
     var count: Int {
         return startCities.count
     }
@@ -45,6 +45,6 @@ struct Cities: City {
     }
     
     mutating func addWeather(for city: String, weather: Weather) {
-        listOfCities[city.capitalized] = weather
+        weatherForCity[city.capitalized] = weather
     }
 }

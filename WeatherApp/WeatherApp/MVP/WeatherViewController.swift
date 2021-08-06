@@ -13,7 +13,7 @@ final class WeatherViewController: UIViewController {
         let table = UITableView()
         table.delegate = self
         table.dataSource = self
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        table.register(CurrentCityCell.self, forCellReuseIdentifier: "cell")
         return table
     }()
     private lazy var searchBar: UISearchBar = {
@@ -22,20 +22,29 @@ final class WeatherViewController: UIViewController {
         bar.placeholder = "Найти город..."
         return bar
     }()
+    private lazy var addButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        button.action = #selector(addCity(_:))
+        button.image = .add
+        return button
+    }()
     
     var cities = Cities()
-    private let presenter = WeatherPresenter()
+    private var presenter: WeatherPresenterProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .green
-        //presenter.delegate = self
-        setupUI()
         
+        presenter = WeatherPresenter()
+        
+        view.backgroundColor = .green
+        navigationItem.rightBarButtonItem = addButton
+        setupUI()
         getWeather()
     }
     
     private func setupUI() {
+        title = "Яндекс Погода"
         [table,searchBar].forEach {
             view.addSubview($0)
         }
@@ -50,35 +59,27 @@ final class WeatherViewController: UIViewController {
             maker.leading.trailing.bottom.equalToSuperview()
         }
     }
+    
+    @objc private func addCity(_ sender: UIBarButtonItem) {
+        guard let city = searchBar.text else { return }
+        cities.add(city: city)
+        getWeather()
+    }
+    
     func getWeather() {
         cities.startCities.forEach { city in
-            presenter.fetchData(city: city) { weather, error in
+            presenter?.fetchData(city: city) { weather, error in
+                if let error = error {
+                    print(error.localizedDescription)
+                    //show error alert
+                }
                 guard let weather = weather else { return }
                 self.cities.addWeather(for: city, weather: weather)
-                print(weather)
                 self.table.reloadData()
             }
         }
     }
 }
-
-//extension WeatherViewController: WeatherDelegate {
-//
-//    func getWeather(city: String, weather: Weather) {
-//        presenter.fetchData { weather, error in
-//
-//        }
-//       // presenter.cities.addWeather(for: city, weather: weather)
-//    }
-//
-//
-//
-//    func showError(error: Error?) {
-//
-//    }
-//
-//
-//}
 
 extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     
@@ -87,13 +88,28 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = table.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        guard let cell = table.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? CurrentCityCell else { return UITableViewCell() }
         let city = cities.startCities[indexPath.row]
-        cell.textLabel?.text = cities.listOfCities[city]?.fact.condition
+        if let weather = cities.weatherForCity[city] {
+            cell.confiugre(with: city, weather: weather)
+        }
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = DetailViewController()
+        let city = cities.startCities[indexPath.row]
+        if let weather = cities.weatherForCity[city] {
+            vc.configure(for: city, with: weather)
+        }
+        presenter?.open(vc: vc, navigation: navigationController!)
+        table.deselectRow(at: indexPath, animated: true)
+    }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let cellHeight: CGFloat = 100
+        return cellHeight
+    }
 }
 
 extension WeatherViewController: UISearchBarDelegate {
