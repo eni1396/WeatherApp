@@ -9,7 +9,7 @@ import SnapKit
 
 final class WeatherViewController: UIViewController {
     
-    let cellID = "cell"
+   private let cellID = "cell"
     
     //MARK:- UI элементы
     private lazy var table: UITableView = {
@@ -59,7 +59,7 @@ final class WeatherViewController: UIViewController {
         }
     }
     //MARK:- получение данных
-    func getWeather() {
+   private func getWeather() {
         cities.startCities.forEach { city in
             presenter?.fetchData(city: city) { [weak self] weather, error in
                 guard let self = self else { return }
