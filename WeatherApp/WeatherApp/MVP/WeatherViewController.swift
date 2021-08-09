@@ -109,7 +109,7 @@ final class WeatherViewController: UIViewController {
 extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return isSearching ? Cities.shared.filteredCities.count : Cities.shared.count
+        return isSearching ? Cities.shared.filteredCount : Cities.shared.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
