@@ -42,20 +42,20 @@ class CurrentCityCell: UITableViewCell {
     
     private func setupUI() {
         [cityName, cityCondition, cityTemperature].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
         
-        cityName.snp.makeConstraints { maker in
-            maker.top.leading.equalToSuperview().inset(15)
-        }
-        
-        cityTemperature.snp.makeConstraints { maker in
-            maker.leading.bottom.equalToSuperview().inset(15)
-        }
-        
-        cityCondition.snp.makeConstraints { maker in
-            maker.trailing.bottom.equalToSuperview().inset(15)
-            maker.width.lessThanOrEqualTo(130)
-        }
+        NSLayoutConstraint.activate([
+            cityName.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 15),
+            cityName.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15),
+            
+            cityTemperature.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 15),
+            cityTemperature.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -15),
+            
+            cityCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -15),
+            cityCondition.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -15),
+            cityCondition.widthAnchor.constraint(lessThanOrEqualToConstant: 130)
+        ])
     }
 }

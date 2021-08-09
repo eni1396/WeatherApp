@@ -7,7 +7,7 @@
 
 import Foundation
 
-//MARK:- Модель для парсинга
+//MARK: - Модель для парсинга
 struct WeatherModel: Codable {
     let fact: Fact
 }

@@ -9,7 +9,7 @@ import UIKit
 import SVGKit
 
 class DetailViewController: UIViewController {
-
+    
     private let cityImage: UIImageView = {
         let view = UIImageView()
         view.clipsToBounds = true
@@ -32,15 +32,20 @@ class DetailViewController: UIViewController {
     }()
     
     private let scroll = UIScrollView()
+    
+    var weather: Weather?
+    var city: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        
         setupUI()
+        configure()
     }
     
-    func configure(for city: String, with weather: Weather) {
+    private func configure() {
+        guard let city = city,
+              let weather = weather else { return }
         title = city
         cityPressure.text = "Давление: \(weather.pressure) мм рт.ст."
         cityTemperature.text = "Температура: \(weather.temperature) °C"
@@ -53,23 +58,37 @@ class DetailViewController: UIViewController {
     }
     
     private func setupUI() {
-
+        
+        // если город уже есть в массиве, кнопка добавления пропадет
+        if !Cities.shared.startCities.contains(city ?? "") {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addCity(_:)))
+        }
         [cityImage, stack].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
+        
+        NSLayoutConstraint.activate([
+            cityImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            cityImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            cityImage.widthAnchor.constraint(equalToConstant: 200),
+            cityImage.heightAnchor.constraint(equalToConstant: 200),
+            
+            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stack.topAnchor.constraint(equalTo: cityImage.bottomAnchor, constant: 70),
+            
+        ])
         
          [cityTemperature, cityPressure, cityHumidity, cityCondition, cityWindSpeed, cityWindDirection].forEach {
             $0.font = .systemFont(ofSize: 17)
         }
-        
-        cityImage.snp.makeConstraints { maker in
-            maker.centerX.equalToSuperview()
-            maker.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(20)
-            maker.width.height.equalTo(200)
-        }
-        stack.snp.makeConstraints { maker in
-            maker.centerX.equalToSuperview()
-            maker.top.equalTo(cityImage.snp.bottom).offset(70)
-        }
+    }
+    
+    @objc private func addCity(_ sender: UIBarButtonItem) {
+        guard let city = city,
+              let weather = weather else { return }
+        Cities.shared.add(city: city)
+        Cities.shared.addWeather(for: city, weather: weather)
+        navigationController?.popViewController(animated: true)
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-//MARK:- структура в более удобном виде
+//MARK: - структура в более удобном виде
 struct Weather {
     let temperature: Int
     private let condition: String
@@ -17,7 +17,7 @@ struct Weather {
     let humidity: Int
     let iconData: String
     
-    //MARK:- Обработка условий
+    //MARK: - Обработка условий
     var localizedCondition: String {
         switch condition {
         case "clear": return "Ясно"

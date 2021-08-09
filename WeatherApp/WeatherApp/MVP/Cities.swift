@@ -18,7 +18,9 @@ protocol City {
 
 struct Cities: City {
     
-    //MARK:- Стартовые 10 городов
+    static var shared = Cities()
+    
+    //MARK: - Стартовые 10 городов
     var startCities = [
         "Москва",
         "Санкт-Петербург",
@@ -31,7 +33,8 @@ struct Cities: City {
         "Калининград",
         "Севастополь",
     ]
-    //MARK:- Словарь с погодой для каждого города
+    var filteredCities = [String]()
+    //MARK: - Словарь с погодой для каждого города
     var weatherForCity = [String : Weather]()
     var count: Int {
         return startCities.count
@@ -44,7 +47,7 @@ struct Cities: City {
     mutating func remove(at index: Int) {
         startCities.remove(at: index)
     }
-    //MARK:- Добавление погоды: город является ключом
+    //MARK: - Добавление погоды: город является ключом
     mutating func addWeather(for city: String, weather: Weather) {
         weatherForCity[city.capitalized] = weather
     }

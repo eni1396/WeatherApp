@@ -3,28 +3,24 @@ PODS:
   - CocoaLumberjack (3.7.2):
     - CocoaLumberjack/Core (= 3.7.2)
   - CocoaLumberjack/Core (3.7.2)
-  - SnapKit (5.0.1)
   - SVGKit (3.0.0):
     - CocoaLumberjack (~> 3.0)
 
 DEPENDENCIES:
   - Alamofire
-  - SnapKit
   - SVGKit
 
 SPEC REPOS:
   trunk:
     - Alamofire
     - CocoaLumberjack
-    - SnapKit
     - SVGKit
 
 SPEC CHECKSUMS:
   Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
   CocoaLumberjack: b7e05132ff94f6ae4dfa9d5bce9141893a21d9da
-  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
 
-PODFILE CHECKSUM: 5ee02d688c97a9ed7ffb70b172f7403eb2dedb41
+PODFILE CHECKSUM: 3102142c94b4924b6e96668786b4e39043a7918d
 
 COCOAPODS: 1.10.1
